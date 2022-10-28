@@ -1,0 +1,24 @@
+{
+  "name": "solution",
+  "description": "POC Solution",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js #314718#"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lucianosdias/solution.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lucianosdias/solution/issues"
+  },
+  "homepage": "https://github.com/lucianosdias/solution#readme",
+  "dependencies": {
+    "fast-xml-parser": "^4.0.11",
+    "minimist": "^1.2.7"
+  }
+}
