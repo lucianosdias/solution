@@ -1,0 +1,97 @@
+<Project DefaultTargets="TestGenexus" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+        <Import Project="C:\Program Files (x86)\GeneXus\GeneXus17Trial\Genexus.Tasks.targets" />
+        <Import Project="C:\Program Files (x86)\GeneXus\GeneXus17Trial\Genexus.Server.Tasks.targets" />
+
+        <PropertyGroup>
+            <KBTemplate>csharp.kbtemplate</KBTemplate>
+            <KBPath>C:\Projetos\Genexus\Models</KBPath>
+            <KBProject>KBPoc2022</KBProject>
+            <ServerInstance>softnoteDY1K2L3</ServerInstance>
+            <Password>Senha1q2w3e4r</Password>
+            <ServerUri>http://sandbox.genexusserver.com/v18</ServerUri>
+            <ServerKBAlias>KBPoc2022</ServerKBAlias>
+            <ServerVersionName>1.1</ServerVersionName>
+            <ServerUserName>gxtechnical\luciano.dias@softdesign.com.br</ServerUserName>
+            <ServerPassword>Ld@1420!</ServerPassword>            
+            <UserName>luciano.dias@softdesign.com.br</UserName>
+            <UserId>sa</UserId>
+            <Password>Senha1q2w3e4r</Password>
+        </PropertyGroup>
+
+        <Target Name="RemoveDir">
+            <RemoveDir Directories="$(KBPath)\$(KBProject)" />
+        </Target>
+
+        <Target Name="CreateKnowledgeBase" DependsOnTargets="RemoveDir">
+            <CreateKnowledgeBase 
+                CreateDbInKbFolder="false"
+                IntegratedSecurity="false"
+                ServerInstance="$(ServerInstance)"
+                UserId="$(UserId)"
+                Password="$(Password)"
+                Directory="$(KBPath)\$(KBProject)" 
+                Template="$(KBTemplate)" />
+        </Target>
+
+        <Target Name="CreateKnowledgeBaseFromServer" DependsOnTargets="RemoveDir">
+            <CreateKnowledgeBaseFromServer
+                IntegratedSecurity="false"
+                CreateDbInKbFolder="false"
+                ServerInstance="$(ServerInstance)"
+                UserId="$(UserId)"
+                Password="$(Password)"
+                ServerUri="$(ServerUri)"
+                ServerKBAlias="$(ServerKBAlias)"
+                ServerVersionName="$(ServerVersionName)"
+                ServerUserName="$(ServerUserName)"
+                ServerPassword="$(ServerPassword)"
+                Directory="$(KBPath)\$(KBProject)" 
+                XmlOutputFile="xmlfile"
+            />
+        </Target>
+
+        <Target Name="CreateBackupAndRestore">
+            <PropertyGroup>
+                <BackupFilename>KB_$([System.DateTime]::Now.ToString('yyyyMMddhhmmss')).bcp</BackupFilename>
+                <BackupPath>$([System.IO.Path]::Combine('$(KBPath)','$(KBProject)', '$(BackupFilename)'))</BackupPath>
+                <RestorePath>$([System.IO.Path]::Combine('$(KBPath)','$(KBProject)', '_restore'))</RestorePath>
+            </PropertyGroup>
+
+            <OpenKnowledgeBase Directory="$(KBPath)\$(KBProject)"/>
+            <BulkcopyKnowledgeBase FullKB="false" OutputFile="$(BackupPath)"/>
+            <CloseKnowledgeBase/>
+
+            <CreateKnowledgeBase Directory="$(RestorePath)" BulkCopyFile="$(BackupPath)"/>
+            <CloseKnowledgeBase/>
+        </Target>
+
+        <Target Name="OpenKnowledgeBase">            
+            <OpenKnowledgeBase 
+                Directory="$(KBPath)\$(KBProject)" 
+                DatabaseUser="$(UserId)" 
+                DatabasePassword="$(Password)"
+                CaptureOutput="true">
+                <Output TaskParameter="TaskOutput" PropertyName="OpenOutput" />
+            </OpenKnowledgeBase>
+        </Target>
+
+        <Target Name="GetCommitNumber" DependsOnTargets="OpenKnowledgeBase">
+            <GetLastCommitNumber
+                VersionName="$(ServerVersionName)"
+                ServerUserName="$(ServerUserName)"
+                ServerPassword="$(ServerPassword)">  
+                <Output TaskParameter="CommitNumber" PropertyName="CommitNumber"/>
+            </GetLastCommitNumber>
+            <Message Text="Last commit number is $(CommitNumber)"/>
+        </Target>
+
+        <Target Name="Build" DependsOnTargets="OpenKnowledgeBase">
+            <BuildAll />
+        </Target>
+
+        <Target Name="Commit" DependsOnTargets="OpenKnowledgeBase">
+            <Commit Comments="$(Comments)" 
+                ServerUserName="$(ServerUserName)"
+                ServerPassword="$(ServerPassword)" />
+        </Target>
+    </Project>

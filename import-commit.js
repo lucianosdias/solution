@@ -43,14 +43,18 @@ module.exports = {
     // PreviewMode="$(PreviewMode)"
     // UpdateFile="${updateFilePath}"
 
+    // ImportKBInformation="${importKbInformation}"
     const xml = `<Import File="${fileName}" 
         ImportType="${importType}"
         LanguageTranslations="${languageTranslation}" 
-        ImportKBInformation="${importKbInformation}" 
         TableIndexesImportBehavior="${tableIndexesBehavior}">
             <Output TaskParameter="ImportedItems" ItemName="ImportedItem" />
-    </Import>`;
+    </Import>
+    <BuildAll ForceRebuild="true" FailIfReorg="true"/>
+    `;
 
     return xml.trim();
   },
 };
+
+// ForceRebuild="true|false" CompileMains="true|false" DetailedNavigation="true|false" FailIfReorg="true|false" DoNotExecuteReorg="true|false"

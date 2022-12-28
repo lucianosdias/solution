@@ -6,12 +6,12 @@ const { XMLParser } = require("fast-xml-parser");
  */
 const objectTypes = {
   Procedure: "Procedure",
-  Transaction: "Procedure",
+  Transaction: "Transaction",
   "Web Panel": "WebPanel",
   "External Object": "ExternalObject",
   "Deployment Unit": "DeploymentUnit",
   "Data Provider": "DataProvider",
-  API: "Procedure",
+  API: "API",
   // confirmar com Vinicius
   "Work With Plus": "WorkWithPlus",
   Domain: "Domain",
@@ -54,10 +54,10 @@ module.exports = {
     commitsFile,
     {
       dependencyType = dependencyTypes.ReferencesTo,
-      referencyType = referencyTypes.None,
+      referencyType = referencyTypes.Minimal,
       includeGXMessages = false,
       includeUntranslatedMessages = false,
-      exportKbInfo = false, // default true
+      exportKbInfo = true, // default true
       exportAll = false,
     } = {}
   ) {
@@ -65,15 +65,24 @@ module.exports = {
     const xmlFile = await fs.readFile(commitsFile);
     const commitsJson = parser.parse(xmlFile);
     const commitsArray = [].concat(commitsJson.log.logentry);
-    const commitChanges = commitsArray
-      .filter((entry) => entry.msg.includes(ticket))
-      .flatMap((entry) => entry.actions.action);
+
+    const onlySpecificCommit = commitsArray.filter((entry) => ticket.length <= 0 || entry.msg.includes(ticket));
+
+    const onlyWithActions = onlySpecificCommit.filter((entry) => entry.actions.toString().length);
+    const commitChanges = onlyWithActions.flatMap((entry) => entry.actions.action);
 
     if (!commitChanges.length) {
       throw new Error("Nenhuma alteração encontrada.");
     }
 
-    const changesString = commitChanges.reduce((accumulator, item) => {
+    const uniqueFiles = commitChanges.reduce((accumulator, item) => {
+      const { objectGuid } = item;
+      if (!accumulator.some((a) => a.objectGuid === objectGuid)) accumulator.push(item);
+
+      return accumulator;
+    }, []);
+
+    const changesString = uniqueFiles.reduce((accumulator, item) => {
       const { objectType, objectName } = item;
 
       const type = objectTypes[objectType];

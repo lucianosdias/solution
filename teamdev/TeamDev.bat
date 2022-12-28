@@ -1,0 +1,1 @@
+"C:\Program Files\Apache Software Foundation\Tomcat 9.0\webapps\SolutionManager_SolutionManagerDSVJavaEnvironment\TeamDev\gx15\TeamDev.exe" history /ServerUrl:http://192.168.9.226/genexusserver15_6 /ServerKbAlias:ERPSolution /ServerKbVersion:ERPSolution /ServerUsername:gmud.solution /ServerPassword:gmud@solution  /FromDate:2021-01-08T08:00:00 /XmlOutput > out.xml

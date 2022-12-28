@@ -1,0 +1,2 @@
+C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe /nologo /fl -v:diag -fileLogger "C:\Program Files (x86)\GeneXus\GeneXus17Trial\Deploy.msbuild" /p:KBPath="C:\Projetos\Genexus\Models\KBPoc2022_1.1" /t:CreateDeploy
+pause
